@@ -1,6 +1,5 @@
 import { observer } from 'mobx-react';
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { AppToolbar } from '../components/AppToolbar';
 import {
     Container,
@@ -24,7 +23,6 @@ import EditVehicleDialog from '../components/EditVehicleDialog';
 
 
 const Homepage = observer(() => {
-    const navigate = useNavigate();
     const [dialogOpen, setDialogOpen] = useState(false);
     const [selectedVehicle, setSelectedVehicle] = useState(null);
     const [viewDialogOpen, setViewDialogOpen] = useState(false);
@@ -81,9 +79,9 @@ const Homepage = observer(() => {
                     <TableBody>
 
                         {vehicleModelStore.models.map((model) => (
-                            <TableRow hover
+                            <TableRow key={model.id} hover
                                 onClick={() => handleRowClick(model)}
-                                style={{ cursor: 'pointer' }} key={model.id}>
+                                style={{ cursor: 'pointer' }}>
                                 <TableCell>{getMakeName(model.makeId)}</TableCell>
                                 <TableCell>{model.name}</TableCell>
                                 <TableCell>{model.year || 'N/A'}</TableCell>
@@ -116,9 +114,9 @@ const Homepage = observer(() => {
                                     <IconButton onClick={() => handleDelete(model.id)}>
                                         <Delete color="error" />
                                     </IconButton>
-                                </TableCell>
-                            </TableRow>
-                        ))}
+                                </TableCell>   
+                            </TableRow>))}
+                     
                     </TableBody>
                 </Table>
             </TableContainer>

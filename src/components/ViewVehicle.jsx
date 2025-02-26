@@ -21,11 +21,11 @@ const ViewVehicle = observer(({ open, vehicle, onClose }) => {
     useEffect(() => {
         const fetchData = async () => {
             if (open && vehicle) {
-                // Fetch fresh model data
+               
                 const freshModel = await vehicleModelStore.getModelById(vehicle.id);
                 setCurrentVehicle(freshModel);
 
-                // Fetch make details using the model's makeId
+                
                 if (freshModel?.makeId) {
                     const make = vehicleMakeStore.makes.find(m => m.id === freshModel.makeId);
                     setMakeDetails(make);
@@ -56,25 +56,25 @@ const ViewVehicle = observer(({ open, vehicle, onClose }) => {
             <DialogContent dividers>
                 <Grid2 container spacing={3}>
                     <Grid2 item xs={12} md={6}>
-                        <Typography variant="subtitle1" color="primary">Make</Typography>
+                        <Typography variant="button" color="primary">Make</Typography>
                         <Typography variant="body1">
                             {makeDetails?.name || 'Unknown Make'}
                         </Typography>
                     </Grid2>
                     <Grid2 item xs={12} md={6}>
-                        <Typography variant="subtitle1" color="primary">Model</Typography>
+                        <Typography variant="button" color="primary">Model</Typography>
                         <Typography variant="body1">{currentVehicle.name}</Typography>
                     </Grid2>
                     <Grid2 item xs={6} md={4}>
-                        <Typography variant="subtitle1" color="primary">Abbreviation</Typography>
+                        <Typography variant="button" color="primary">Abbreviation</Typography>
                         <Typography variant="body1">{currentVehicle.abrv}</Typography>
                     </Grid2>
                     <Grid2 item xs={6} md={4}>
-                        <Typography variant="subtitle1" color="primary">Year</Typography>
+                        <Typography variant="button" color="primary">Year</Typography>
                         <Typography variant="body1">{currentVehicle.year || 'N/A'}</Typography>
                     </Grid2>
                     <Grid2 item xs={6} md={4}>
-                        <Typography variant="subtitle1" color="primary">Color</Typography>
+                        <Typography variant="button" color="primary">Color</Typography>
                         <div style={{
                             backgroundColor: currentVehicle.color,
                             width: '50px',
@@ -84,7 +84,7 @@ const ViewVehicle = observer(({ open, vehicle, onClose }) => {
                         }} />
                     </Grid2>
                     <Grid2 item xs={6} md={4}>
-                        <Typography variant="subtitle1" color="primary">Favorite</Typography>
+                        <Typography variant="button" color="primary">Favorite</Typography>
                         <Typography variant="body1">
                             {currentVehicle.favorite ? (
                                 <Favorite color="error" />
@@ -97,7 +97,7 @@ const ViewVehicle = observer(({ open, vehicle, onClose }) => {
             </DialogContent>
 
             <DialogActions>
-                <IconButton onClick={handleEdit}>
+                <IconButton>
                     <Edit color="primary" />
                 </IconButton>
                 <IconButton onClick={handleDelete}>
