@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import {
     Dialog,
     DialogTitle,
@@ -8,29 +8,33 @@ import {
     Button,
     IconButton,
     Typography,
-    Grid2
+    Grid2 
 } from '@mui/material';
-import { Edit, Delete, Favorite, FavoriteBorder } from '@mui/icons-material';
+import { Edit, Delete, Close, Favorite, FavoriteBorder } from '@mui/icons-material';
 import { vehicleModelStore } from '../stores/VehicleModelStore';
 import { vehicleMakeStore } from '../stores/VehicleMakeStore';
 
-
 const ViewVehicle = observer(({ open, vehicle, onClose }) => {
+    const [currentVehicle, setCurrentVehicle] = useState(null);
+    const [makeDetails, setMakeDetails] = useState(null);
 
-    const getMakeName = (makeId) => {
-        return vehicleMakeStore.makes.find(make => make.id === makeId)?.name || 'Unknown';
-    };
     useEffect(() => {
-       
         const fetchData = async () => {
             if (open && vehicle) {
-                const freshData = await vehicleModelStore.getModelById(vehicle.id);
-                setSelectedVehicle(freshData);
-              
+                // Fetch fresh model data
+                const freshModel = await vehicleModelStore.getModelById(vehicle.id);
+                setCurrentVehicle(freshModel);
+
+                // Fetch make details using the model's makeId
+                if (freshModel?.makeId) {
+                    const make = vehicleMakeStore.makes.find(m => m.id === freshModel.makeId);
+                    setMakeDetails(make);
+                }
             }
         };
         fetchData();
-    }, [open]); 
+    }, [open, vehicle]);
+
     const handleDelete = async () => {
         if (window.confirm('Are you sure you want to delete this vehicle?')) {
             await vehicleModelStore.deleteModel(vehicle.id);
@@ -38,68 +42,68 @@ const ViewVehicle = observer(({ open, vehicle, onClose }) => {
         }
     };
 
-    const handleEdit = () => {
-       // Close view dialog
-        // You'll need to open the edit dialog here (modify Homepage state)
-    };
-
+    if (!currentVehicle) return null;
 
     return (
-        <Dialog open={open} onClose={onClose} maxWidth>
+        <Dialog open={open} onClose={onClose} maxWidth="md">
             <DialogTitle>
-                <Typography variant='h5'>  Vehicle Details</Typography>
-              
-                
+                <Typography variant='h5'>Vehicle Details</Typography>
+                <IconButton onClick={onClose} sx={{ position: 'absolute', right: 8, top: 8 }}>
+                    <Close />
+                </IconButton>
             </DialogTitle>
 
             <DialogContent dividers>
-                <Grid2 container spacing={6}>
-                    <Grid2 item xs={10}>
-                        <Typography variant="button" color="primary">Make</Typography>
-                        <Typography variant="body1">{getMakeName(vehicle.makeId)}</Typography>
+                <Grid2 container spacing={3}>
+                    <Grid2 item xs={12} md={6}>
+                        <Typography variant="subtitle1" color="primary">Make</Typography>
+                        <Typography variant="body1">
+                            {makeDetails?.name || 'Unknown Make'}
+                        </Typography>
                     </Grid2>
-                    <Grid2 item xs={10}>
-                        <Typography variant="button" color="primary">Model</Typography>
-                        <Typography variant="body1">{vehicle.name}</Typography>
+                    <Grid2 item xs={12} md={6}>
+                        <Typography variant="subtitle1" color="primary">Model</Typography>
+                        <Typography variant="body1">{currentVehicle.name}</Typography>
                     </Grid2>
-                    <Grid2 item xs={6}>
-                        <Typography variant="button" color="primary">Abbreviation</Typography>
-                        <Typography variant="body1">{vehicle.abrv}</Typography>
+                    <Grid2 item xs={6} md={4}>
+                        <Typography variant="subtitle1" color="primary">Abbreviation</Typography>
+                        <Typography variant="body1">{currentVehicle.abrv}</Typography>
                     </Grid2>
-                    <Grid2 item xs={6}>
-                        <Typography variant="button" color="primary">Year</Typography>
-                        <Typography variant="body1">{vehicle.year || 'N/A'}</Typography>
+                    <Grid2 item xs={6} md={4}>
+                        <Typography variant="subtitle1" color="primary">Year</Typography>
+                        <Typography variant="body1">{currentVehicle.year || 'N/A'}</Typography>
                     </Grid2>
-                    <Grid2 item xs={6}>
-                        <Typography variant="button" color="primary">Color</Typography>
+                    <Grid2 item xs={6} md={4}>
+                        <Typography variant="subtitle1" color="primary">Color</Typography>
                         <div style={{
-                            backgroundColor: vehicle.color,
+                            backgroundColor: currentVehicle.color,
                             width: '50px',
                             height: '25px',
-                            borderRadius: '10%',
+                            borderRadius: '4px',
                             border: '1px solid #ddd'
                         }} />
                     </Grid2>
-                    <Grid2 item xs={4}>
-                        <Typography variant="button" color="primary">{" "}</Typography>
-                        <Typography variant="h4">
-                            {vehicle.favorite ? (<Favorite color="primary" />) : (<FavoriteBorder />)}
-                           
-                                                             
-                                                                        
+                    <Grid2 item xs={6} md={4}>
+                        <Typography variant="subtitle1" color="primary">Favorite</Typography>
+                        <Typography variant="body1">
+                            {currentVehicle.favorite ? (
+                                <Favorite color="error" />
+                            ) : (
+                                <FavoriteBorder color="disabled" />
+                            )}
                         </Typography>
                     </Grid2>
                 </Grid2>
             </DialogContent>
 
             <DialogActions>
-                <IconButton onClick={handleEdit} sx={{ float: 'right' }} >
-                    <Edit color="textPrimary" />
+                <IconButton onClick={handleEdit}>
+                    <Edit color="primary" />
                 </IconButton>
-                <IconButton onClick={handleDelete} sx={{ float: 'right' }} >
-                    <Delete color="warning" />
+                <IconButton onClick={handleDelete}>
+                    <Delete color="error" />
                 </IconButton>
-                <Button onClick={onClose} variant="outlined">
+                <Button onClick={onClose} variant="contained">
                     Close
                 </Button>
             </DialogActions>

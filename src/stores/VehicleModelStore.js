@@ -6,7 +6,7 @@ import { vehicleMakeStore } from './VehicleMakeStore';
 export class VehicleModelStore {
   models = [];
   totalCount = 0;
- 
+
   error = null;
   pageSize = 10;
   lastVisible = null;
@@ -25,7 +25,7 @@ export class VehicleModelStore {
       lastVisible: observable,
       error: observable,
       modelsWithMakes: computed,
-    
+
       loadModels: action,
       createModel: action,
       updateModel: action,
@@ -35,7 +35,6 @@ export class VehicleModelStore {
     this.service = new VehicleModelService();
   }
   async loadModels(queryParams = []) {
-   
     try {
       const result = await this.service.getAll(queryParams);
       this.models = result.data;
@@ -44,7 +43,6 @@ export class VehicleModelStore {
     } catch (error) {
       this.error = error.message;
     } finally {
-     
     }
   }
   parseModelData(data) {
@@ -89,9 +87,13 @@ export class VehicleModelStore {
       throw error;
     }
   }
+
+  
+
   async getModelById(id) {
     try {
-      return await this.service.getById(id);
+      const model = await this.service.getById(id);
+      return model ? { ...model, makeId: model.makeId } : null;
     } catch (error) {
       this.error = error.message;
       return null;

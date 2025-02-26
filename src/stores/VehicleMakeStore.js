@@ -10,6 +10,8 @@ export class VehicleMakeStore {
   pageSize = 10;
   lastVisible = null;
 
+  
+
   constructor() {
     makeObservable(this, {
       makes: observable,
@@ -69,6 +71,7 @@ export class VehicleMakeStore {
       throw error;
     }
   }
+   
 }
 
 const vehicleMakeStore = new VehicleMakeStore();
