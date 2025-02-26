@@ -20,6 +20,7 @@ import { vehicleMakeStore } from '../stores/VehicleMakeStore';
 import { vehicleModelStore } from '../stores/VehicleModelStore';
 import ViewVehicle from '../components/ViewVehicle';
 import NewVehicleDialog from '../components/NewVehicleDialog';
+import EditVehicleDialog from '../components/EditVehicleDialog';
 
 
 const Homepage = observer(() => {
@@ -27,10 +28,17 @@ const Homepage = observer(() => {
     const [dialogOpen, setDialogOpen] = useState(false);
     const [selectedVehicle, setSelectedVehicle] = useState(null);
     const [viewDialogOpen, setViewDialogOpen] = useState(false);
-
+    const [editDialogOpen, setEditDialogOpen] = useState(false);
+ 
     const handleRowClick = (vehicle) => {
         setSelectedVehicle(vehicle);
         setViewDialogOpen(true);
+    };
+
+    const handleEditVehicle = (vehicle) => {
+        setSelectedVehicle(vehicle);
+        setEditDialogOpen(true);
+        
     };
 
     useEffect(() => {
@@ -45,9 +53,14 @@ const Homepage = observer(() => {
     const handleToggleFavorite = async (modelId, isFavorite) => {
         await vehicleModelStore.updateModel(modelId, { favorite: isFavorite });
     };
-
-    const handleDelete = async (modelId) => {
-        await vehicleModelStore.deleteModel(modelId);
+    const handleEdit = async (modelId) => {
+        await vehicleModelStore.updateModel(modelId);
+    };
+    const handleDelete = async () => {
+        if (window.confirm('Are you sure you want to delete this vehicle?')) {
+            await vehicleModelStore.deleteModel(vehicle.id);
+            onClose();
+        }
     };
 
     return (
@@ -56,15 +69,13 @@ const Homepage = observer(() => {
             <TableContainer component={Paper} sx={{ mt: 2 }}>
                 <Table>
                     <TableHead>
-                            <TableRow
-                               
-                            >
-                            <TableCell>Make</TableCell>
-                            <TableCell>Model</TableCell>
-                            <TableCell>Year</TableCell>
-                            <TableCell>Color</TableCell>
-                            <TableCell>Favorite</TableCell>
-                            <TableCell>Actions</TableCell>
+                        <TableRow color="primary">
+                            <TableCell style={{ fontSize: 16, fontWeight: 'bold' }}>Make</TableCell>
+                            <TableCell style={{ fontSize: 16, fontWeight: 'bold' }}>Model</TableCell>
+                            <TableCell style={{ fontSize: 16, fontWeight: 'bold' }}>Year</TableCell>
+                            <TableCell style={{ fontSize: 16, fontWeight: 'bold' }}>Color</TableCell>
+                            <TableCell style={{ fontSize: 16, fontWeight: 'bold' }}>Favorite</TableCell>
+                            <TableCell style={{ fontSize: 16, fontWeight: 'bold' }}>Edit / Delete</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -74,14 +85,14 @@ const Homepage = observer(() => {
                                 onClick={() => handleRowClick(model)}
                                 style={{ cursor: 'pointer' }} key={model.id}>
                                 <TableCell>{getMakeName(model.makeId)}</TableCell>
-                                <TableCell>{model.name} ({model.abrv})</TableCell>
+                                <TableCell>{model.name}</TableCell>
                                 <TableCell>{model.year || 'N/A'}</TableCell>
                                 <TableCell>
                                     <div style={{
                                         backgroundColor: model.color || '#fff',
-                                        width: 20,
-                                        height: 20,
-                                        borderRadius: '50%',
+                                        width: 45,
+                                        height: 25,
+                                        borderRadius: '10%',
                                         border: '1px solid #ddd'
                                     }} />
                                 </TableCell>
@@ -97,7 +108,9 @@ const Homepage = observer(() => {
 
                                 </TableCell>
                                 <TableCell>
-                                    <IconButton onClick={() => navigate(`/vehicle-models/${model.id}/edit`)}>
+                                   
+                                    <IconButton onClick={() => handleEditVehicle(model.id)}>
+                                      
                                         <Edit />
                                     </IconButton>
                                     <IconButton onClick={() => handleDelete(model.id)}>
@@ -134,6 +147,15 @@ const Homepage = observer(() => {
                         vehicleModelStore.loadModels();
                         vehicleMakeStore.loadMakes();
                     }
+                }}
+            />
+            <EditVehicleDialog
+                open={editDialogOpen}
+                vehicle={selectedVehicle}
+                onClose={() => setEditDialogOpen(false)}
+                onSuccess={() => {
+                    vehicleModelStore.loadModels();
+                    vehicleMakeStore.loadMakes();
                 }}
             />
         </Container>

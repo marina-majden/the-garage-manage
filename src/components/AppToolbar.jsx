@@ -40,7 +40,7 @@ export const AppToolbar = () => {
     }));
 
     const StyledInputBase = styled(InputBase)(({ theme }) => ({
-        color: 'black',
+        color: 'inherit',
         width: '100%',
         '& .MuiInputBase-input': {
             padding: theme.spacing(1, 1, 1, 0),
@@ -57,16 +57,16 @@ export const AppToolbar = () => {
 
 return (
 
-    <AppBar position="static" top="0" color="primary">
-        <Toolbar>
-            <TwoWheeler sx={{ fontSize: 48, flexGrow: 1, display: { xs: 'none', md: 'inline' }, mr: 1 }} />
+    <AppBar position="static" sx={{ width: "100%", backgroundColor: 'info.light' }}>
+        <Toolbar display="flex">
+            <TwoWheeler sx={{ fontSize: 76, flexGrow: 1, display: { xs: 'none', md: 'inline' }, mr: 1 }} />
             <Typography variant="h3"
                 noWrap
-                sx={{ flexGrow: 1, display: { xs: 'inline' }, mx: 'auto' }}>
-                All The Wheels
+                sx={{ flexGrow: 1, display: { xs: 'inline' }, mx: 'auto', my: 2 }}>
+                Manage The Garage
             </Typography>
         </Toolbar>
-        <Toolbar>
+        <Toolbar display="flex">
             <Typography variant="h6"
                 component="div"
                 sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}>

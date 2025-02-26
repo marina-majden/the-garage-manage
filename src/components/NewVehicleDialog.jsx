@@ -1,7 +1,7 @@
 import { observer } from 'mobx-react';
 import { useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
-import { DevTool } from '@hookform/devtools';
+
 import {
     Dialog,
     DialogTitle,
@@ -10,18 +10,16 @@ import {
     Button,
     TextField,
     FormControl,
-    InputLabel,
-    Select,
-    MenuItem,
     FormControlLabel,
     Checkbox,
-    RadioGroup,
-    Radio
+    Stack,
+    Typography
 } from '@mui/material';
-import { ChromePicker } from 'react-color';
+import { CompactPicker } from 'react-color';
 import { Favorite, FavoriteBorder } from '@mui/icons-material';
 import { vehicleMakeStore } from '../stores/VehicleMakeStore';
 import { vehicleModelStore } from '../stores/VehicleModelStore';
+
 
 const NewVehicleDialog = observer(({ open, onClose }) => {
     const {
@@ -33,8 +31,6 @@ const NewVehicleDialog = observer(({ open, onClose }) => {
         setValue
     } = useForm({
         defaultValues: {
-            makeType: 'existing',
-            existingMakeId: '',
             newMakeName: '',
             newMakeAbrv: '',
             modelName: '',
@@ -53,14 +49,11 @@ const NewVehicleDialog = observer(({ open, onClose }) => {
         return brightness > 128 ? '#000000' : '#ffffff';
     };
     const [showColorPicker, setShowColorPicker] = useState(false);
-    const makeType = watch('makeType');
+   
 
     const onSubmit = async (data) => {
         try {
-            let makeId = data.makeType === 'existing'
-                ? data.existingMakeId
-                : await createNewMake(data);
-
+            let makeId = await createNewMake(data);
             await createNewModel(makeId, data);
             onClose(true);
             reset();
@@ -89,68 +82,25 @@ const NewVehicleDialog = observer(({ open, onClose }) => {
     };
 
     return (
-        <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
-            <DialogTitle>Add New Vehicle</DialogTitle>
+        <Dialog open={open} onClose={onClose} maxWidth="lg" sx={{ height: "600px" }} >
+            <DialogTitle>
+                <Typography variant="h4" sx={{ mt: 1, mb: 0  }}>  Add New Vehicle</Typography>
+              </DialogTitle>
             <form onSubmit={handleSubmit(onSubmit)}>
                 <DialogContent>
-                    <Controller
-                        name="makeType"
-                        control={control}
-                        render={({ field }) => (
-                            <FormControl component="fieldset" fullWidth margin="normal">
-                                <RadioGroup {...field}>
-                                    <FormControlLabel
-                                        value="existing"
-                                        control={<Radio />}
-                                        label="Select Existing Make"
-                                    />
-                                    <FormControlLabel
-                                        value="new"
-                                        control={<Radio />}
-                                        label="Create New Make"
-                                    />
-                                </RadioGroup>
-                            </FormControl>
-                        )}
-                    />
-
-                    {makeType === 'existing' ? (
-                        <Controller
-                            name="existingMakeId"
-                            control={control}
-                            rules={{ required: "Please select a make" }}
-                            render={({ field }) => (
-                                <FormControl fullWidth margin="normal" error={!!errors.existingMakeId}>
-                                    <InputLabel>Select Make</InputLabel>
-                                    <Select {...field} label="Select Make">
-                                        {vehicleMakeStore.makes.map(make => (
-                                            <MenuItem key={make.id} value={make.id}>
-                                                {make.name} ({make.abrv})
-                                            </MenuItem>
-                                        ))}
-                                    </Select>
-                                    {errors.existingMakeId && (
-                                        <Typography color="error" variant="caption">
-                                            {errors.existingMakeId.message}
-                                        </Typography>
-                                    )}
-                                </FormControl>
-                            )}
-                        />
-                    ) : (
-                        <>
+                       <Stack display='flex' fullWidth direction="row" sx={{ justifyContent: "space-around", flexWrap: 'wrap'}} >
                             <Controller
                                 name="newMakeName"
                                 control={control}
                                 rules={{
-                                    required: "Make name is required",
+                                    required: "Vehicle make(brand) name is required",
                                     minLength: { value: 2, message: "Minimum 2 characters" },
                                     maxLength: { value: 50, message: "Maximum 50 characters" }
                                 }}
                                 render={({ field }) => (
                                     <TextField
                                         {...field}
-                                        fullWidth
+                                        sx={{ m: 1, width: "50ch", maxWidth: "70ch" }}
                                         margin="normal"
                                         label="Make Name"
                                         error={!!errors.newMakeName}
@@ -160,6 +110,7 @@ const NewVehicleDialog = observer(({ open, onClose }) => {
                             />
 
                             <Controller
+                           
                                 name="newMakeAbrv"
                                 control={control}
                                 rules={{
@@ -170,7 +121,7 @@ const NewVehicleDialog = observer(({ open, onClose }) => {
                                 render={({ field }) => (
                                     <TextField
                                         {...field}
-                                        fullWidth
+                                        sx={{ m: 1, width: "20ch" }}
                                         margin="normal"
                                         label="Make Abbreviation"
                                         error={!!errors.newMakeAbrv}
@@ -178,10 +129,8 @@ const NewVehicleDialog = observer(({ open, onClose }) => {
                                     />
                                 )}
                             />
-                        </>
-                    )}
-
-                    {/* Repeat similar Controller pattern for other fields */}
+               </Stack>
+                    <Stack display='flex' fullWidth direction="row" sx={{ justifyContent: "space-around", flexWrap: 'wrap' }} >
                     <Controller
                         name="modelName"
                         control={control}
@@ -193,7 +142,7 @@ const NewVehicleDialog = observer(({ open, onClose }) => {
                         render={({ field }) => (
                             <TextField
                                 {...field}
-                                fullWidth
+                                sx={{ m: 1, width: "50ch", maxWidth: "70ch" }}
                                 margin="normal"
                                 label="Model Name"
                                 error={!!errors.modelName}
@@ -213,7 +162,7 @@ const NewVehicleDialog = observer(({ open, onClose }) => {
                         render={({ field }) => (
                             <TextField
                                 {...field}
-                                fullWidth
+                                sx={{ m: 1, width: "20ch" }}
                                 margin="normal"
                                 label="Model Abbreviation"
                                 error={!!errors.modelAbrv}
@@ -221,7 +170,8 @@ const NewVehicleDialog = observer(({ open, onClose }) => {
                             />
                         )}
                     />
-
+                      </Stack>
+                    <Stack display='flex' fullWidth direction="row" sx={{ justifyContent: "space-evenly", alignItems: "center", flexWrap: 'wrap' }} >
                     <Controller
                         name="year"
                         control={control}
@@ -232,7 +182,7 @@ const NewVehicleDialog = observer(({ open, onClose }) => {
                         render={({ field }) => (
                             <TextField
                                 {...field}
-                                fullWidth
+                                sx={{ width: "20ch" }}
                                 margin="normal"
                                 label="Year"
                                 type="number"
@@ -246,8 +196,10 @@ const NewVehicleDialog = observer(({ open, onClose }) => {
                         name="color"
                         control={control}
                         render={({ field }) => (
-                            <FormControl fullWidth margin="normal">
+                            <FormControl 
+                             >
                                 <Button
+                                    sx={{ width: "10ch", height: "5ch" }}
                                     variant="outlined"
                                     onClick={() => setShowColorPicker(!showColorPicker)}
                                     style={{
@@ -258,9 +210,11 @@ const NewVehicleDialog = observer(({ open, onClose }) => {
                                     {field.value || 'Select Color'}
                                 </Button>
                                 {showColorPicker && (
-                                    <ChromePicker
+                                    <CompactPicker
+                                       
                                         color={field.value}
-                                        onChangeComplete={(color) => field.onChange(color.hex)}
+                                        onChange={(color) => field.onChange(color.hex)}
+                                        onChangeComplete={() => setShowColorPicker(!showColorPicker)}
                                     />
                                 )}
                             </FormControl>
@@ -275,7 +229,7 @@ const NewVehicleDialog = observer(({ open, onClose }) => {
                                 control={
                                     <Checkbox
                                         icon={<FavoriteBorder />}
-                                        checkedIcon={<Favorite color="error" />}
+                                        checkedIcon={<Favorite color="primary" />}
                                         checked={field.value}
                                         onChange={(e) => field.onChange(e.target.checked)}
                                     />
@@ -284,16 +238,17 @@ const NewVehicleDialog = observer(({ open, onClose }) => {
                             />
                         )}
                     />
+                    </Stack>
                 </DialogContent>
 
                 <DialogActions>
                     <Button onClick={() => onClose(false)}>Cancel</Button>
                     <Button type="submit" variant="contained" color="primary">
-                        Create Vehicle
+                        Add Vehicle
                     </Button>
                 </DialogActions>
             </form>
-            <DevTool control={control} /> {/* Optional dev tools */}
+           
         </Dialog>
     );
 });
