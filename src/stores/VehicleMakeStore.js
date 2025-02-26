@@ -1,4 +1,4 @@
-import { makeObservable, observable, action } from "mobx";
+import { makeObservable, observable, computed, action } from "mobx";
 import { VehicleMakeService } from "../services/VehicleMakeService";
 import { createSortQuery, createFilterQuery, combineQueries } from "../utils/query";
 
@@ -10,13 +10,12 @@ export class VehicleMakeStore {
   pageSize = 10;
   lastVisible = null;
 
-  
-
   constructor() {
     makeObservable(this, {
       makes: observable,
       isLoading: observable,
       error: observable,
+      searchableMakes: computed,
       loadMakes: action,
       createMake: action,
       updateMake: action,
@@ -25,7 +24,7 @@ export class VehicleMakeStore {
     });
     this.service = new VehicleMakeService();
   }
- 
+
   async loadMakes(sortBy = "name", sortOrder = "asc", filters = []) {
     const sortQuery = createSortQuery(sortBy, sortOrder);
     const filterQuery = createFilterQuery(filters);
@@ -71,7 +70,17 @@ export class VehicleMakeStore {
       throw error;
     }
   }
-   
+
+  
+  get searchableMakes() {
+    return this.makes.map((make) => ({
+      type: "make",
+      id: make.id,
+      name: make.name,
+      abrv: make.abrv,
+    }));
+  }
+ 
 }
 
 const vehicleMakeStore = new VehicleMakeStore();

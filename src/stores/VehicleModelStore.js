@@ -25,7 +25,7 @@ export class VehicleModelStore {
       lastVisible: observable,
       error: observable,
       modelsWithMakes: computed,
-
+      searchableModels: computed,
       loadModels: action,
       createModel: action,
       updateModel: action,
@@ -88,8 +88,6 @@ export class VehicleModelStore {
     }
   }
 
-  
-
   async getModelById(id) {
     try {
       const model = await this.service.getById(id);
@@ -98,6 +96,15 @@ export class VehicleModelStore {
       this.error = error.message;
       return null;
     }
-  };
+  }
+  get searchableModels() {
+    return this.models.map((model) => ({
+      type: "model",
+      id: model.id,
+      name: model.name,
+      abrv: model.abrv,
+      makeId: model.makeId,
+    }));
+  }
 }
 export const vehicleModelStore = new VehicleModelStore();
