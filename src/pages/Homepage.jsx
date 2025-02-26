@@ -1,5 +1,7 @@
 import { observer } from 'mobx-react';
 import { useEffect, useState } from 'react';
+import { ThemeProvider } from '@mui/material/styles';
+import theme from '../utils/theme';
 import { AppToolbar } from '../components/AppToolbar';
 import {
     Container,
@@ -63,13 +65,15 @@ const Homepage = observer(() => {
     };
 
     return (
-        <Container maxWidth="xl">
+        <ThemeProvider theme={theme}>
+            <Container maxWidth="xl" color='primary'>
           <AppToolbar />
-            <TableContainer component={Paper} sx={{ mt: 2 }}>
+            <TableContainer component={Paper} 
+            sx={{ bgcolor: 'primary.bg',mt: 2 }}>
                 <Table>
-                    <TableHead>
-                        <TableRow color="primary">
-                            <TableCell style={{ fontSize: 16, fontWeight: 'bold' }}>Make</TableCell>
+                        <TableHead sx={{ borderBottom: "2px solid black", borderBottomColor: 'primary.light' }}>
+                            <TableRow>
+                            <TableCell style={{ fontSize: 16,  fontWeight: 'bold' }}>Make</TableCell>
                             <TableCell style={{ fontSize: 16, fontWeight: 'bold' }}>Model</TableCell>
                             <TableCell style={{ fontSize: 16, fontWeight: 'bold' }}>Year</TableCell>
                             <TableCell style={{ fontSize: 16, fontWeight: 'bold' }}>Color</TableCell>
@@ -99,7 +103,7 @@ const Homepage = observer(() => {
 
                                     <IconButton onClick={() => handleToggleFavorite(model.id, !model.favorite)}>
                                         {model.favorite ? (
-                                            <Favorite color="error" />
+                                            <Favorite color="primary" />
                                         ) : (
                                             <FavoriteBorder />
                                         )}
@@ -113,7 +117,7 @@ const Homepage = observer(() => {
                                         <Edit />
                                     </IconButton>
                                     <IconButton onClick={() => handleDelete(model.id)}>
-                                        <Delete color="error" />
+                                        <Delete color="secondary" />
                                     </IconButton>
                                 </TableCell>   
                             </TableRow>))}
@@ -159,7 +163,7 @@ const Homepage = observer(() => {
                 }}
             />
         </Container>
-
+        </ThemeProvider>
     );
 });
 

@@ -49,7 +49,7 @@ const ViewVehicle = observer(({ open, vehicle, onClose, onEdit }) => {
     if (!currentVehicle) return null;
 
     return (
-        <Dialog open={open} onClose={onClose} maxWidth="md">
+        <Dialog open={open} onClose={onClose} fullWidth>
             <DialogTitle>
                 <Typography>Vehicle Details</Typography>
                 <IconButton onClick={onClose} sx={{ position: 'absolute', right: 8, top: 8 }}>
