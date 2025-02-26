@@ -27,6 +27,7 @@ const Homepage = observer(() => {
     const [selectedVehicle, setSelectedVehicle] = useState(null);
     const [viewDialogOpen, setViewDialogOpen] = useState(false);
     const [editDialogOpen, setEditDialogOpen] = useState(false);
+    const [selectedVehicleForEdit, setSelectedVehicleForEdit] = useState(null);
  
     const handleRowClick = (vehicle) => {
         setSelectedVehicle(vehicle);
@@ -34,9 +35,9 @@ const Homepage = observer(() => {
     };
 
     const handleEditVehicle = (vehicle) => {
-        setSelectedVehicle(vehicle);
+        setSelectedVehicleForEdit(vehicle);
+        setViewDialogOpen(false);
         setEditDialogOpen(true);
-        
     };
 
     useEffect(() => {
@@ -136,6 +137,7 @@ const Homepage = observer(() => {
                 open={viewDialogOpen}
                 vehicle={selectedVehicle}
                 onClose={() => setViewDialogOpen(false)}
+                onEdit={handleEditVehicle} 
             />
             <NewVehicleDialog
                 open={dialogOpen}
@@ -149,7 +151,7 @@ const Homepage = observer(() => {
             />
             <EditVehicleDialog
                 open={editDialogOpen}
-                vehicle={selectedVehicle}
+                vehicle={selectedVehicleForEdit}
                 onClose={() => setEditDialogOpen(false)}
                 onSuccess={() => {
                     vehicleModelStore.loadModels();

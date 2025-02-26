@@ -14,7 +14,7 @@ import { Edit, Delete, Close, Favorite, FavoriteBorder } from '@mui/icons-materi
 import { vehicleModelStore } from '../stores/VehicleModelStore';
 import { vehicleMakeStore } from '../stores/VehicleMakeStore';
 
-const ViewVehicle = observer(({ open, vehicle, onClose }) => {
+const ViewVehicle = observer(({ open, vehicle, onClose, onEdit }) => {
     const [currentVehicle, setCurrentVehicle] = useState(null);
     const [makeDetails, setMakeDetails] = useState(null);
 
@@ -35,6 +35,10 @@ const ViewVehicle = observer(({ open, vehicle, onClose }) => {
         fetchData();
     }, [open, vehicle]);
 
+      const handleEdit = () => {
+    onEdit(currentVehicle); 
+    onClose(); 
+  };
     const handleDelete = async () => {
         if (window.confirm('Are you sure you want to delete this vehicle?')) {
             await vehicleModelStore.deleteModel(vehicle.id);
@@ -47,7 +51,7 @@ const ViewVehicle = observer(({ open, vehicle, onClose }) => {
     return (
         <Dialog open={open} onClose={onClose} maxWidth="md">
             <DialogTitle>
-                <Typography variant='h5'>Vehicle Details</Typography>
+                <Typography>Vehicle Details</Typography>
                 <IconButton onClick={onClose} sx={{ position: 'absolute', right: 8, top: 8 }}>
                     <Close />
                 </IconButton>
@@ -97,7 +101,7 @@ const ViewVehicle = observer(({ open, vehicle, onClose }) => {
             </DialogContent>
 
             <DialogActions>
-                <IconButton>
+                <IconButton onClick={handleEdit}>
                     <Edit color="primary" />
                 </IconButton>
                 <IconButton onClick={handleDelete}>
@@ -106,6 +110,7 @@ const ViewVehicle = observer(({ open, vehicle, onClose }) => {
                 <Button onClick={onClose} variant="contained">
                     Close
                 </Button>
+                
             </DialogActions>
         </Dialog>
     );

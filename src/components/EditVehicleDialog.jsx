@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import {
   Dialog,
@@ -13,12 +13,15 @@ import {
   Checkbox,
    IconButton
 } from '@mui/material';
-import { ChromePicker } from 'react-color';
+import { CompactPicker } from 'react-color';
 import { Favorite, FavoriteBorder, Close } from '@mui/icons-material';
 import { vehicleMakeStore } from '../stores/VehicleMakeStore';
 import { vehicleModelStore } from '../stores/VehicleModelStore';
 
-const EditVehicleDialog = observer(({ open, vehicle, onClose, onSuccess }) => {
+
+const EditVehicleDialog = observer(({ open, make, vehicle, onClose, onSuccess }) => {
+  const [showColorPicker, setShowColorPicker] = useState(false);
+  const makeDetails = vehicleMakeStore.makes.find(make => make.id === vehicle?.makeId);
   const { 
     control,
     handleSubmit,
@@ -28,20 +31,20 @@ const EditVehicleDialog = observer(({ open, vehicle, onClose, onSuccess }) => {
     setValue
   } = useForm();
 
-  
-
-
   useEffect(() => {
-    if (vehicle) {
+    if (vehicle && makeDetails) {
       reset({
+     
+        newMakeName: makeDetails.name,
+        newMakeAbrv: makeDetails.abrv,
         modelName: vehicle.name,
         modelAbrv: vehicle.abrv,
-        year: vehicle.year || '',
-        color: vehicle.color || '#ffffff',
-        favorite: vehicle.favorite || false
+        year: vehicle.year,
+        color: vehicle.color,
+        favorite: vehicle.favorite
       });
     }
-  }, [vehicle, reset]);
+  }, [vehicle, makeDetails, reset]);
 
   const handleUpdate = async (data) => {
     try {
@@ -65,16 +68,24 @@ const EditVehicleDialog = observer(({ open, vehicle, onClose, onSuccess }) => {
     }
   };
 
+
+
+  // Helper function for make updates
   const handleMakeUpdate = async (data) => {
- 
-     
-      const newMake = await vehicleMakeStore.createMake({
+    if (makeDetails) {
+      // Update existing make
+      await vehicleMakeStore.updateMake(makeDetails.id, {
         name: data.newMakeName,
         abrv: data.newMakeAbrv
       });
-      return newMake.id;
-    
-
+      return makeDetails.id;
+    }
+    // Create new make
+    const newMake = await vehicleMakeStore.createMake({
+      name: data.newMakeName,
+      abrv: data.newMakeAbrv
+    });
+    return newMake.id;
   };
 
   const getContrastColor = (hexColor) => {
@@ -99,6 +110,7 @@ const EditVehicleDialog = observer(({ open, vehicle, onClose, onSuccess }) => {
         <DialogContent>
         
             <>
+            
               <Controller
                 name="newMakeName"
                 control={control}
@@ -195,7 +207,7 @@ const EditVehicleDialog = observer(({ open, vehicle, onClose, onSuccess }) => {
                   {field.value || 'Select Color'}
                 </Button>
                 {showColorPicker && (
-                  <ChromePicker
+                  <CompactPicker
                     color={field.value}
                     onChange={(color) => field.onChange(color.hex)}
                   />
