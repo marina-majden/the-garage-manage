@@ -18,23 +18,20 @@ import { Favorite, FavoriteBorder, Close } from '@mui/icons-material';
 import { vehicleMakeStore } from '../stores/VehicleMakeStore';
 import { vehicleModelStore } from '../stores/VehicleModelStore';
 
-
 const EditVehicleDialog = observer(({ open, make, vehicle, onClose, onSuccess }) => {
   const [showColorPicker, setShowColorPicker] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const makeDetails = vehicleMakeStore.makes.find(make => make.id === vehicle?.makeId);
-  const { 
+  const {
     control,
     handleSubmit,
     formState: { errors },
     reset,
-    watch,
     setValue
   } = useForm();
-
   useEffect(() => {
     if (vehicle && makeDetails) {
       reset({
-     
         newMakeName: makeDetails.name,
         newMakeAbrv: makeDetails.abrv,
         modelName: vehicle.name,
@@ -44,9 +41,10 @@ const EditVehicleDialog = observer(({ open, make, vehicle, onClose, onSuccess })
         favorite: vehicle.favorite
       });
     }
-  }, [vehicle, makeDetails, reset]);
+  }, [vehicle?.id, makeDetails?.id, reset]); // Only reset when IDs change
 
   const handleUpdate = async (data) => {
+    setIsSubmitting(true);
     try {
       // Update or create make
       const makeId = await handleMakeUpdate(data);
@@ -65,28 +63,26 @@ const EditVehicleDialog = observer(({ open, make, vehicle, onClose, onSuccess })
       onClose();
     } catch (error) {
       console.error('Update failed:', error);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
-
-
-  // Helper function for make updates
   const handleMakeUpdate = async (data) => {
     if (makeDetails) {
-      // Update existing make
       await vehicleMakeStore.updateMake(makeDetails.id, {
         name: data.newMakeName,
         abrv: data.newMakeAbrv
       });
       return makeDetails.id;
     }
-    // Create new make
     const newMake = await vehicleMakeStore.createMake({
       name: data.newMakeName,
       abrv: data.newMakeAbrv
     });
     return newMake.id;
   };
+
 
   const getContrastColor = (hexColor) => {
     const hex = hexColor.replace('#', '');
@@ -105,27 +101,25 @@ const EditVehicleDialog = observer(({ open, make, vehicle, onClose, onSuccess })
           <Close />
         </IconButton>
       </DialogTitle>
-      
       <form onSubmit={handleSubmit(handleUpdate)}>
         <DialogContent>
         
             <>
-            
-              <Controller
-                name="newMakeName"
-                control={control}
-                rules={{ required: "Make name is required" }}
-                render={({ field }) => (
-                  <TextField
-                    {...field}
-                    fullWidth
-                    margin="normal"
-                    label="Make Name"
-                    error={!!errors.newMakeName}
-                    helperText={errors.newMakeName?.message}
-                  />
-                )}
-              />
+            <Controller
+              name="newMakeName"
+              control={control}
+              rules={{ required: "Make name is required" }}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  fullWidth
+                  margin="normal"
+                  label="Make Name"
+                  error={!!errors.newMakeName}
+                  helperText={errors.newMakeName?.message}
+                />
+              )}
+             />
               <Controller
                 name="newMakeAbrv"
                 control={control}
@@ -236,11 +230,16 @@ const EditVehicleDialog = observer(({ open, make, vehicle, onClose, onSuccess })
         </DialogContent>
 
         <DialogActions>
-          <Button onClick={onClose} color="secondary">
+          <Button onClick={onClose} color="secondary" disabled={isSubmitting}>
             Cancel
           </Button>
-          <Button type="submit" variant="contained" color="primary">
-            Save Changes
+          <Button
+            type="submit"
+            variant="contained"
+            color="primary"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? 'Saving...' : 'Save Changes'}
           </Button>
         </DialogActions>
       </form>
