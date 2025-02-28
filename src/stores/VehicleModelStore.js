@@ -106,5 +106,6 @@ export class VehicleModelStore {
       makeId: model.makeId,
     }));
   }
+  
 }
 export const vehicleModelStore = new VehicleModelStore();
