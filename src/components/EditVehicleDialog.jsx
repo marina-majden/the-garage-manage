@@ -224,7 +224,7 @@ const EditVehicleDialog = observer(({ open, make, vehicle, onClose, onSuccess })
                 control={
                   <Checkbox
                     icon={<FavoriteBorder />}
-                    checkedIcon={<Favorite color="error" />}
+                    checkedIcon={<Favorite color="primary" />}
                     checked={field.value}
                     onChange={(e) => field.onChange(e.target.checked)}
                   />

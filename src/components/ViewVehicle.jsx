@@ -105,7 +105,7 @@ const ViewVehicle = observer(({ open, vehicle, onClose, onEdit }) => {
                     <Edit color="primary" />
                 </IconButton>
                 <IconButton onClick={handleDelete}>
-                    <Delete color="error" />
+                    <Delete color="secondary" />
                 </IconButton>
                 <Button onClick={onClose} variant="contained">
                     Close
