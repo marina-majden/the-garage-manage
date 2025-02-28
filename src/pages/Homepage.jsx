@@ -11,12 +11,13 @@ import {
     TableContainer,
     TableHead,
     TableRow,
+
     Paper,
     Fab,
     IconButton,
     Button,
 } from '@mui/material';
-import { Edit, Delete, Add, Favorite, FavoriteBorder } from '@mui/icons-material';
+import {  Add, Favorite, FavoriteBorder } from '@mui/icons-material';
 import { vehicleMakeStore } from '../stores/VehicleMakeStore';
 import { vehicleModelStore } from '../stores/VehicleModelStore';
 import ViewVehicle from '../components/ViewVehicle';
@@ -54,15 +55,7 @@ const Homepage = observer(() => {
     const handleToggleFavorite = async (modelId, isFavorite) => {
         await vehicleModelStore.updateModel(modelId, { favorite: isFavorite });
     };
-    const handleEdit = async (modelId) => {
-        await vehicleModelStore.updateModel(modelId);
-    };
-    const handleDelete = async () => {
-        if (window.confirm('Are you sure you want to delete this vehicle?')) {
-            await vehicleModelStore.deleteModel(vehicle.id);
-            onClose();
-        }
-    };
+  
 
     return (
         <ThemeProvider theme={theme}>
@@ -78,15 +71,13 @@ const Homepage = observer(() => {
                             <TableCell style={{ fontSize: 16, fontWeight: 'bold' }}>Year</TableCell>
                             <TableCell style={{ fontSize: 16, fontWeight: 'bold' }}>Color</TableCell>
                             <TableCell style={{ fontSize: 16, fontWeight: 'bold' }}>Favorite</TableCell>
-                            <TableCell style={{ fontSize: 16, fontWeight: 'bold' }}>Edit / Delete</TableCell>
+                            <TableCell style={{ fontSize: 16, fontWeight: 'bold' }}></TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
 
                         {vehicleModelStore.models.map((model) => (
-                            <TableRow key={model.id} hover
-                                onClick={() => handleRowClick(model)}
-                                style={{ cursor: 'pointer' }}>
+                            <TableRow>
                                 <TableCell>{getMakeName(model.makeId)}</TableCell>
                                 <TableCell>{model.name}</TableCell>
                                 <TableCell>{model.year || 'N/A'}</TableCell>
@@ -111,14 +102,10 @@ const Homepage = observer(() => {
 
                                 </TableCell>
                                 <TableCell>
+                                   <Button variant='outlined' aria-label='view-vehicle-details'  onClick={() => handleRowClick(model)}
+                                        style={{ cursor: 'pointer' }}>View Details</Button>
                                    
-                                    <IconButton onClick={() => handleEditVehicle(model.id)}>
-                                      
-                                        <Edit />
-                                    </IconButton>
-                                    <IconButton onClick={() => handleDelete(model.id)}>
-                                        <Delete color="secondary" />
-                                    </IconButton>
+                                 
                                 </TableCell>   
                             </TableRow>))}
                      
